@@ -3,64 +3,106 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TrendForge - Learn, Create & Earn</title>
+  <title>TrendForge - Learn, Quiz & Earn</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    .card-shadow { box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1); }
-    .hide-scrollbar::-webkit-scrollbar { display: none; }
-    .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    .card-shadow { box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2), 0 8px 10px -6px rgba(0, 0, 0, 0.2); }
   </style>
 </head>
 <body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col font-sans">
 
+  <!-- TOP HEADER -->
   <header class="p-4 bg-slate-800/80 backdrop-blur border-b border-slate-700 sticky top-0 z-50 flex justify-between items-center">
     <div class="flex items-center gap-2">
       <div class="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center font-bold text-white">TF</div>
       <span class="font-bold text-lg tracking-wide bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent">TrendForge</span>
     </div>
-    <span class="text-xs bg-indigo-900/50 text-indigo-300 px-2.5 py-1 rounded-full border border-indigo-700/50">v1.0 Ready</span>
+    <span class="text-xs bg-indigo-900/50 text-indigo-300 px-2.5 py-1 rounded-full border border-indigo-700/50">v2.0 Exam Ready</span>
   </header>
 
+  <!-- NAVIGATION TABS -->
   <nav class="flex border-b border-slate-800 bg-slate-800/40 text-sm font-medium">
-    <button onclick="switchTab('cards')" id="tab-cards" class="flex-1 py-3 text-center border-b-2 border-indigo-500 text-indigo-400">2-Min Decks</button>
+    <button onclick="switchTab('study')" id="tab-study" class="flex-1 py-3 text-center border-b-2 border-indigo-500 text-indigo-400">Study & Quiz</button>
     <button onclick="switchTab('script')" id="tab-script" class="flex-1 py-3 text-center border-b-2 border-transparent text-slate-400 hover:text-slate-200">Script AI</button>
     <button onclick="switchTab('gigs')" id="tab-gigs" class="flex-1 py-3 text-center border-b-2 border-transparent text-slate-400 hover:text-slate-200">Micro-Gigs</button>
   </nav>
 
+  <!-- MAIN CONTAINER -->
   <main class="flex-1 p-4 max-w-md mx-auto w-full flex flex-col justify-center">
 
-    <section id="sec-cards" class="flex flex-col gap-4">
-      <div class="flex justify-between items-center text-xs text-slate-400">
-        <span>Category: <strong class="text-indigo-400">Physics Formulas</strong></span>
-        <span id="card-counter">Card 1 of 3</span>
+    <!-- TAB 1: STUDY DECKS & QUIZZES -->
+    <section id="sec-study" class="flex flex-col gap-4">
+      
+      <!-- CHAPTER SELECTOR -->
+      <div class="bg-slate-800/60 p-3 rounded-xl border border-slate-700 flex flex-col gap-2">
+        <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Select Chapter</label>
+        <select id="chapter-select" onchange="loadChapter()" class="w-full bg-slate-900 border border-slate-700 text-slate-200 rounded-lg p-2.5 text-sm focus:outline-none focus:border-indigo-500">
+          <option value="ch1">Class 12 Physics: Chapter 1 - Electrostatics</option>
+          <option value="ch2">Class 12 Physics: Chapter 2 - Current Electricity</option>
+          <option value="ch3">Class 12 Chemistry: Chapter 1 - Solutions</option>
+        </select>
       </div>
 
-      <div id="card-box" class="bg-slate-800 border border-slate-700 rounded-2xl p-6 min-h-[320px] flex flex-col justify-between card-shadow transition-all duration-300">
-        <div>
-          <span id="card-tag" class="text-xs font-semibold uppercase tracking-wider text-cyan-400 bg-cyan-950/80 px-2.5 py-1 rounded-md border border-cyan-800/50">Coulomb's Law</span>
-          <h2 id="card-title" class="text-xl font-bold mt-3 text-slate-100">Electrostatic Force Equation</h2>
-          <p id="card-body" class="text-slate-300 text-sm mt-3 leading-relaxed">
-            Formula: <strong>F = k · (|q₁ · q₂| / r²)</strong><br><br>
-            tells you how strongly two stationary electric charges push or pull each other. Double the distance, and the force drops to ¼!
-          </p>
+      <!-- MODE TOGGLE BUTTONS -->
+      <div class="flex gap-2 bg-slate-800 p-1 rounded-xl border border-slate-700 text-xs font-semibold">
+        <button id="btn-mode-deck" onclick="setStudyMode('deck')" class="flex-1 py-2 rounded-lg bg-indigo-600 text-white">1. Formula Deck</button>
+        <button id="btn-mode-quiz" onclick="setStudyMode('quiz')" class="flex-1 py-2 rounded-lg bg-slate-900 text-slate-400 hover:text-slate-200">2. Practice Quiz</button>
+      </div>
+
+      <!-- DECK VIEW -->
+      <div id="deck-view" class="flex flex-col gap-4">
+        <div class="flex justify-between items-center text-xs text-slate-400">
+          <span id="deck-chapter-title" class="font-medium text-indigo-400">Class 12 Physics</span>
+          <span id="card-counter">Card 1 of 3</span>
         </div>
-        <div class="mt-4 pt-3 border-t border-slate-700/60 flex justify-between items-center text-xs text-slate-400">
-          <span>Read time: 20s</span>
-          <span class="text-indigo-400 font-medium">Swipe or tap Next →</span>
+
+        <div id="card-box" class="bg-slate-800 border border-slate-700 rounded-2xl p-6 min-h-[300px] flex flex-col justify-between card-shadow">
+          <div>
+            <span id="card-tag" class="text-xs font-semibold uppercase tracking-wider text-cyan-400 bg-cyan-950/80 px-2.5 py-1 rounded-md border border-cyan-800/50">Tag</span>
+            <h2 id="card-title" class="text-xl font-bold mt-3 text-slate-100">Title</h2>
+            <p id="card-body" class="text-slate-300 text-sm mt-3 leading-relaxed">Content</p>
+          </div>
+          <div class="mt-4 pt-3 border-t border-slate-700/60 flex justify-between items-center text-xs text-slate-400">
+            <span>2-Min Read</span>
+            <span class="text-indigo-400 font-medium">Swipe/Tap Next →</span>
+          </div>
+        </div>
+
+        <div class="flex gap-3">
+          <button onclick="prevCard()" class="flex-1 py-2.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-xl font-medium text-slate-300 text-sm">Previous</button>
+          <button onclick="nextCard()" class="flex-1 py-2.5 bg-indigo-600 hover:bg-indigo-500 rounded-xl font-medium text-white text-sm">Next Card</button>
         </div>
       </div>
 
-      <div class="flex gap-3">
-        <button onclick="prevCard()" class="flex-1 py-2.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-xl font-medium text-slate-300 text-sm">Previous</button>
-        <button onclick="nextCard()" class="flex-1 py-2.5 bg-indigo-600 hover:bg-indigo-500 rounded-xl font-medium text-white text-sm">Next Card</button>
+      <!-- QUIZ VIEW -->
+      <div id="quiz-view" class="hidden flex-col gap-4">
+        <div class="flex justify-between items-center text-xs">
+          <span id="quiz-level" class="font-bold text-amber-400 bg-amber-950/80 px-2.5 py-1 rounded border border-amber-800/50">Level 1: Class 12 Boards</span>
+          <span id="quiz-counter" class="text-slate-400">Question 1 of 3</span>
+        </div>
+
+        <div class="bg-slate-800 border border-slate-700 rounded-2xl p-5 card-shadow flex flex-col gap-4">
+          <p id="quiz-question" class="text-sm font-semibold text-slate-100 leading-relaxed">Question text goes here</p>
+          
+          <div id="quiz-options" class="flex flex-col gap-2">
+            <!-- Options dynamically rendered -->
+          </div>
+
+          <div id="quiz-explanation" class="hidden text-xs bg-slate-900 p-3 rounded-lg border border-slate-800 text-slate-300 leading-relaxed">
+            <!-- Explanation rendered on answer selection -->
+          </div>
+        </div>
+
+        <button id="quiz-next-btn" onclick="nextQuestion()" class="hidden w-full py-2.5 bg-indigo-600 hover:bg-indigo-500 rounded-xl font-medium text-white text-sm">Next Question →</button>
       </div>
+
     </section>
 
+    <!-- TAB 2: SCRIPT AI -->
     <section id="sec-script" class="hidden flex-col gap-4">
       <div class="bg-slate-800/60 p-4 rounded-xl border border-slate-700">
         <label class="block text-xs font-medium text-slate-400 mb-1">Topic or Product Idea</label>
         <input id="script-input" type="text" placeholder="e.g. How to prepare for JEE in 3 months" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-slate-100 focus:outline-none focus:border-indigo-500 mb-3">
-        
         <button onclick="generateScript()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-medium py-2.5 rounded-lg text-sm transition">Generate 15s Script</button>
       </div>
 
@@ -77,6 +119,7 @@
       </div>
     </section>
 
+    <!-- TAB 3: MICRO-GIGS -->
     <section id="sec-gigs" class="hidden flex-col gap-3">
       <p class="text-xs text-slate-400 mb-1">Select a 15-minute micro-task to start earning:</p>
       
@@ -101,10 +144,90 @@
 
   </main>
 
+  <!-- JAVASCRIPT ENGINE -->
   <script>
-    // TAB SWITCHING LOGIC
+    // CHAPTER DATA STORE
+    const chapters = {
+      ch1: {
+        title: "Class 12 Physics: Electrostatics",
+        deck: [
+          { tag: "Coulomb's Law", title: "Electrostatic Force Equation", body: "Formula: <strong>F = k · (|q₁ · q₂| / r²)</strong><br><br>Force between two stationary charges. Double the distance, and the force drops to ¼!" },
+          { tag: "Electric Field", title: "Field Intensity (E)", body: "Formula: <strong>E = F / q₀ = k · Q / r²</strong><br><br>Measures the force experienced per unit positive test charge placed in an electric field." },
+          { tag: "Gauss's Law", title: "Total Electric Flux", body: "Formula: <strong>Φ = ∮ E · dA = Q_enclosed / ε₀</strong><br><br>The total electric flux through any closed surface is equal to 1/ε₀ times the net charge enclosed." }
+        ],
+        quiz: [
+          {
+            level: "Level 1: Class 12 Boards",
+            q: "What happens to the electrostatic force between two point charges if the distance between them is doubled?",
+            options: ["It doubles", "It quadruples", "It is halved", "It reduces to 1/4th"],
+            ans: 3,
+            exp: "Coulomb's Law states F ∝ 1/r². If distance r is doubled (2r), F becomes 1/(2)² = 1/4th of the original force."
+          },
+          {
+            level: "Level 2: JEE Main",
+            q: "An electric dipole of moment p is placed in a uniform electric field E. What is the maximum torque experienced by the dipole?",
+            options: ["Zero", "p · E", "2 · p · E", "p / E"],
+            ans: 1,
+            exp: "Torque τ = p × E = pE sin(θ). The maximum value of sin(θ) is 1 (when θ = 90°), so τ_max = p · E."
+          },
+          {
+            level: "Level 3: JEE Advanced",
+            q: "A spherical shell of radius R carries a charge Q. What is the electric field at a point distance r from the center where r < R?",
+            options: ["kQ / r²", "kQ / R²", "Zero", "kQr / R³"],
+            ans: 2,
+            exp: "According to Gauss's Law, the net charge enclosed inside a hollow conducting spherical shell is zero. Thus, E_inside = 0 for r < R."
+          }
+        ]
+      },
+      ch2: {
+        title: "Class 12 Physics: Current Electricity",
+        deck: [
+          { tag: "Ohm's Law", title: "Voltage & Resistance", body: "Formula: <strong>V = I · R</strong><br><br>Voltage drives electric current against resistance. Linear conductors follow this relationship at constant temperature." },
+          { tag: "Kirchhoff's Voltage Law", title: "Loop Rule (KVL)", body: "Formula: <strong>Σ V = 0</strong><br><br>The algebraic sum of all potential differences around any closed circuit loop must equal zero (Conservation of Energy)." }
+        ],
+        quiz: [
+          {
+            level: "Level 1: Class 12 Boards",
+            q: "If three resistors of 2 Ω, 3 Ω, and 6 Ω are connected in parallel, what is their equivalent resistance?",
+            options: ["11 Ω", "1 Ω", "0.5 Ω", "6 Ω"],
+            ans: 1,
+            exp: "1/R_eq = 1/2 + 1/3 + 1/6 = (3 + 2 + 1)/6 = 6/6 = 1. Therefore, R_eq = 1 Ω."
+          }
+        ]
+      },
+      ch3: {
+        title: "Class 12 Chemistry: Solutions",
+        deck: [
+          { tag: "Raoult's Law", title: "Vapor Pressure", body: "Formula: <strong>P_solution = X_solvent · P°_solvent</strong><br><br>The partial vapor pressure of a volatile component is directly proportional to its mole fraction in solution." }
+        ],
+        quiz: [
+          {
+            level: "Level 1: Class 12 Boards",
+            q: "Which of the following concentration terms is independent of temperature?",
+            options: ["Molarity", "Molality", "Normality", "Formality"],
+            ans: 1,
+            exp: "Molality is defined as moles of solute per kg of solvent (mass-based). Since mass does not change with temperature, molality remains independent of temperature."
+          }
+        ]
+      }
+    };
+
+    let activeChapterKey = 'ch1';
+    let currentCardIdx = 0;
+    let currentQuizIdx = 0;
+
+    // INITIAL LOAD
+    function loadChapter() {
+      activeChapterKey = document.getElementById('chapter-select').value;
+      currentCardIdx = 0;
+      currentQuizIdx = 0;
+      renderDeckCard();
+      renderQuizQuestion();
+    }
+
+    // TAB NAVIGATION
     function switchTab(tab) {
-      ['cards', 'script', 'gigs'].forEach(t => {
+      ['study', 'script', 'gigs'].forEach(t => {
         document.getElementById(`sec-${t}`).classList.add('hidden');
         document.getElementById(`tab-${t}`).classList.remove('border-indigo-500', 'text-indigo-400');
         document.getElementById(`tab-${t}`).classList.add('border-transparent', 'text-slate-400');
@@ -113,48 +236,114 @@
       document.getElementById(`tab-${tab}`).classList.add('border-indigo-500', 'text-indigo-400');
     }
 
-    // SAMPLE 2-MIN DECK DATA
-    const deck = [
-      { tag: "Coulomb's Law", title: "Electrostatic Force Equation", body: "Formula: F = k · (|q₁ · q₂| / r²)<br><br>Measures attraction or repulsion between charges. Distance matters exponentially: double the distance, ¼ the force." },
-      { tag: "Ohm's Law", title: "Voltage & Current Ratio", body: "Formula: V = I · R<br><br>Voltage (V) drives electric current (I) against resistance (R). Keep resistance low when you need high current flow." },
-      { tag: "Atomic Habits", title: "The 1% Rule", body: "Concept: Small improvements accumulate over time.<br><br>Getting 1% better every day for 365 days makes you 37 times better by the end of the year." }
-    ];
-    let currentCardIndex = 0;
+    // STUDY MODE TOGGLE (DECK vs QUIZ)
+    function setStudyMode(mode) {
+      const deckView = document.getElementById('deck-view');
+      const quizView = document.getElementById('quiz-view');
+      const btnDeck = document.getElementById('btn-mode-deck');
+      const btnQuiz = document.getElementById('btn-mode-quiz');
 
-    function renderCard() {
-      const c = deck[currentCardIndex];
-      document.getElementById('card-tag').innerText = c.tag;
-      document.getElementById('card-title').innerText = c.title;
-      document.getElementById('card-body').innerHTML = c.body;
-      document.getElementById('card-counter').innerText = `Card ${currentCardIndex + 1} of ${deck.length}`;
+      if (mode === 'deck') {
+        deckView.classList.remove('hidden');
+        quizView.classList.add('hidden');
+        btnDeck.className = "flex-1 py-2 rounded-lg bg-indigo-600 text-white";
+        btnQuiz.className = "flex-1 py-2 rounded-lg bg-slate-900 text-slate-400 hover:text-slate-200";
+      } else {
+        deckView.classList.add('hidden');
+        quizView.classList.remove('hidden');
+        btnQuiz.className = "flex-1 py-2 rounded-lg bg-indigo-600 text-white";
+        btnDeck.className = "flex-1 py-2 rounded-lg bg-slate-900 text-slate-400 hover:text-slate-200";
+      }
+    }
+
+    // DECK RENDERERS
+    function renderDeckCard() {
+      const ch = chapters[activeChapterKey];
+      const card = ch.deck[currentCardIdx];
+      document.getElementById('deck-chapter-title').innerText = ch.title;
+      document.getElementById('card-tag').innerText = card.tag;
+      document.getElementById('card-title').innerText = card.title;
+      document.getElementById('card-body').innerHTML = card.body;
+      document.getElementById('card-counter').innerText = `Card ${currentCardIdx + 1} of ${ch.deck.length}`;
     }
 
     function nextCard() {
-      currentCardIndex = (currentCardIndex + 1) % deck.length;
-      renderCard();
+      const deck = chapters[activeChapterKey].deck;
+      currentCardIdx = (currentCardIdx + 1) % deck.length;
+      renderDeckCard();
     }
 
     function prevCard() {
-      currentCardIndex = (currentCardIndex - 1 + deck.length) % deck.length;
-      renderCard();
+      const deck = chapters[activeChapterKey].deck;
+      currentCardIdx = (currentCardIdx - 1 + deck.length) % deck.length;
+      renderDeckCard();
     }
 
-    // SCRIPT GENERATOR (LOCAL TEMPLATE ENGINE)
+    // QUIZ RENDERERS
+    function renderQuizQuestion() {
+      const quizList = chapters[activeChapterKey].quiz;
+      const qData = quizList[currentQuizIdx];
+
+      document.getElementById('quiz-level').innerText = qData.level;
+      document.getElementById('quiz-counter').innerText = `Question ${currentQuizIdx + 1} of ${quizList.length}`;
+      document.getElementById('quiz-question').innerText = qData.q;
+      document.getElementById('quiz-explanation').classList.add('hidden');
+      document.getElementById('quiz-next-btn').classList.add('hidden');
+
+      const optionsDiv = document.getElementById('quiz-options');
+      optionsDiv.innerHTML = '';
+
+      qData.options.forEach((optText, idx) => {
+        const btn = document.createElement('button');
+        btn.className = "w-full text-left p-3 rounded-lg bg-slate-900 border border-slate-700 hover:border-indigo-500 text-xs text-slate-200 transition";
+        btn.innerText = `${idx + 1}. ${optText}`;
+        btn.onclick = () => selectOption(idx, qData.ans, qData.exp);
+        optionsDiv.appendChild(btn);
+      });
+    }
+
+    function selectOption(selectedIdx, correctIdx, explanation) {
+      const optionsDiv = document.getElementById('quiz-options');
+      const buttons = optionsDiv.querySelectorAll('button');
+
+      buttons.forEach((btn, idx) => {
+        btn.disabled = true;
+        if (idx === correctIdx) {
+          btn.className = "w-full text-left p-3 rounded-lg bg-emerald-950 border border-emerald-500 text-xs text-emerald-200 font-semibold";
+        } else if (idx === selectedIdx) {
+          btn.className = "w-full text-left p-3 rounded-lg bg-rose-950 border border-rose-500 text-xs text-rose-200";
+        }
+      });
+
+      const expDiv = document.getElementById('quiz-explanation');
+      expDiv.innerText = `Explanation: ${explanation}`;
+      expDiv.classList.remove('hidden');
+
+      const nextBtn = document.getElementById('quiz-next-btn');
+      if (currentQuizIdx < chapters[activeChapterKey].quiz.length - 1) {
+        nextBtn.classList.remove('hidden');
+      }
+    }
+
+    function nextQuestion() {
+      currentQuizIdx++;
+      renderQuizQuestion();
+    }
+
+    // SCRIPT GENERATOR
     function generateScript() {
       const topic = document.getElementById('script-input').value.trim() || "Studying effectively";
-      const hooksUl = document.getElementById('script-hooks');
-      const bodyP = document.getElementById('script-body');
-
-      hooksUl.innerHTML = `
-        <li>"Stop doing ${topic} the wrong way..."</li>
+      document.getElementById('script-hooks').innerHTML = `
+        <li>"Stop studying ${topic} the wrong way..."</li>
         <li>"3 simple tricks to master ${topic} in 15 seconds."</li>
         <li>"If you struggle with ${topic}, watch this right now."</li>
       `;
-
-      bodyP.innerText = `When it comes to ${topic}, most people waste hours on unnecessary details. Focus on the core rule first, test yourself instantly with 3 questions, and repeat for 3 days straight. Save this video so you don't forget!`;
-
+      document.getElementById('script-body').innerText = `When it comes to ${topic}, most people waste hours on unnecessary details. Focus on the core rule first, test yourself with 3 questions, and repeat!`;
       document.getElementById('script-output').classList.remove('hidden');
     }
+
+    // INITIAL RENDER ON LOAD
+    loadChapter();
   </script>
 </body>
 </html>
